@@ -6,3 +6,5 @@ CN_EXCHANGES = ['binance', 'bittrex']
 
 S3_BUCKET_NAME = environ.get('S3_BUCKET_NAME', '')
 S3_FILE_NAME = environ.get('S3_FILE_NAME', 'cryptopians_notifier.json')
+
+SLACK_WEBHOOK_URL = environ.get('SLACK_WEBHOOK_URL', '')
