@@ -1,0 +1,11 @@
+exclude *
+recursive-exclude * *
+
+include README.md
+include setup.py
+
+graft src/cn
+
+global-exclude .DS_Store
+global-exclude *.pyc
+global-exclude __pycache__
