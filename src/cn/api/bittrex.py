@@ -4,15 +4,16 @@ from cn.api import AbstractApi
 
 
 class Api(AbstractApi):
-    def get_currencies(self):
+    def get_exchange_info(self):
         res = requests.get('https://bittrex.com/api/v1.1/public/getcurrencies')
-        return self.deserialize_currencies(res.json())
+        return self.deserialize(res.json())
 
-    def deserialize_currencies(self, data):
-        result = []
+    def deserialize(self, data):
+        currencies = []
         for obj in data['result']:
-            result.append({
-                'id': obj['Currency'].lower(),
-                'name': obj['CurrencyLong']
+            currencies.append({
+                'id': obj['Currency'].upper(),
             })
-        return result
+        return {
+            'currencies': currencies,
+        }
