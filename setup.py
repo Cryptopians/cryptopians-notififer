@@ -1,8 +1,13 @@
 from setuptools import find_packages, setup
 
 
+test_require = [
+    'flake8',
+    'isort',
+]
+
 setup(
-    name='cryptopians-notififer',
+    name='cryptopians-notifier',
     version='0.1.0',
     description='Cryptopians Notifier.',
     author='Rob Moorman',
@@ -11,6 +16,9 @@ setup(
         'console_scripts': [
             'cn=cn.core.management.command_line:main'
         ]
+    },
+    extras_require={
+        'test': test_require
     },
     package_dir={'': 'src'},
     packages=find_packages('src'),

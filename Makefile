@@ -7,7 +7,15 @@ clean:
 
 install:
 	pip install -r requirements.txt
-	pip install -e .
+	pip install -e .[test]
 
 image:
-	docker build -t cryptopians-notififer .
+	docker build -t cryptopians-notifier .
+
+flake8:
+	flake8 --exclude=tests src
+
+isort:
+	isort --recursive --check-only --diff src/cn
+
+lint: flake8 isort

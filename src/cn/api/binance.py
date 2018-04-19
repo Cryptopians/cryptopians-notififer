@@ -11,7 +11,7 @@ class Api(AbstractApi):
     def deserialize(self, data):
         currencies = []
         for obj in data['symbols']:
-            if obj['status'].upper() == 'TRADING':                
+            if obj['status'].upper() == 'TRADING':
                 currencies.append({
                     'id': obj['baseAsset'].upper(),
                 })
