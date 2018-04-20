@@ -1,4 +1,7 @@
+import sys
 import time
+
+import ccxt
 
 from cn import settings
 from cn.core import store
@@ -8,27 +11,24 @@ from cn.utils.module import import_string
 logger = getLogger(__name__)
 
 
-def get_exchange_clients():
-    clients = []
-    exchanges = settings.CN_EXCHANGES.split(',')
-    for exchange in exchanges:
-        klass = import_string('cn.api.%s.Api' % exchange)
-        clients.append({
-            'exchange': exchange,
-            'instance': klass(),
-        })
-    return clients
-
-
 def run():
-    clients = get_exchange_clients()
     initialized = store.initialize_store()
     if not initialized:
         logger.warning("Couldn't initialize store from remote")
     while True:
-        time.sleep(int(settings.CN_INTERVAL))
-        for client in clients:
-            result = client['instance'].get_exchange_info()
-            store.add_currencies(client['exchange'], result['currencies'])
-        store.update_store()
+        for exchange in ccxt.exchanges:
+            klass = import_string('ccxt.%s' % exchange)
+            client = klass()
+            if client.has.get('publicAPI'):
+                try:
+                    markets = client.load_markets()
+                except:
+                    err = sys.exc_info()[0]
+                    msg = "Couldn't fetch data from '%s': %s" % (client.name, err)
+                    logger.warning(msg)
+                if markets:
+                    store.add_markets(client, markets)
         logger.info("Successfully verified data from %d exchanges" % len(clients))  # noqa
+        store.update_store()        
+        time.sleep(int(settings.CN_INTERVAL))
+

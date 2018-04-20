@@ -47,26 +47,30 @@ def update_store():
         logger.warning("Couldn't update the remote store")
 
 
-def add_currencies(exchange_name, currencies=[]):
-    """Adds currencies in (memory) store.
+def add_markets(exchange, markets=[]):
+    """Adds markets in (memory) store.
 
     This method is also responsible for detecting mutations in the store and
     handle further business logic for these mutations, e.g. notifications.
     """
     is_new_exchange = False
     # Ensure exchange is stored in memory
-    if exchange_name not in state:
-        state[exchange_name] = {
-            'currencies': {},
-            'name': exchange_name,
+    if exchange.id not in state:
+        state[exchange.id] = {
+            'markets': {},
+            'id': exchange.id,
+            'name': exchange.name,
         }
         is_new_exchange = True
-    exchange_currencies = state[exchange_name]['currencies']
-    for currency in currencies:
-        if not currency['id'] in exchange_currencies:
-            # Add new currency in exchange
-            exchange_currencies[currency['id']] = currency
+        logger.info("New exchange added '%s'" % exchange.name)
+    exchange_markets = state[exchange.id]['markets']
+    for market in markets:
+        symbol = markets[market]['symbol']
+        if not symbol in exchange_markets:
+            # Add new market in exchange
+            exchange_markets[symbol] = markets[market]
             if not is_new_exchange:
-                # Only handle new currency for existing exchanges (prevents
-                # initial handling of all currencies)
-                handler.handle_new_currency(exchange_name, currency)
+                # # Only handle new markets for existing exchanges (prevents
+                # # initial handling of all markets)
+                handler.handle_new_market(exchange, markets[market])
+    state[exchange.id]['markets'] = exchange_markets

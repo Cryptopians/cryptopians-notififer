@@ -32,7 +32,6 @@ The following environment variables can be used:
 ```python
 CN_BOT_NAME  # Cryptopians Notifier
 CN_INTERVAL  # 60 (seconds)
-CN_EXCHANGES  # binance,bittrex (comma separated values)
 S3_BUCKET_NAME  # The name of the S3 bucket to use
 S3_FILE_NAME  # cryptopians_notifier.json
 SLACK_WEBHOOK_URL  # https://hooks.slack.com/services/xxx/yyy/zzz
