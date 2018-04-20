@@ -15,8 +15,6 @@ def handle_new_currency(exchange_name, currency):
             'text': 'New currency %s added to exchange %s' % (
                 currency['id'], exchange_name),
             'username': settings.CN_BOT_NAME,
-        }, headers={
-            'Content-Type': 'application/json'
         }))
     except:
         logger.warning("Couldn't send text message to Slack")
