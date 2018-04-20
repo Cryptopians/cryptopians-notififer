@@ -68,7 +68,9 @@ def add_markets(exchange, markets=[]):
         symbol = markets[market]['symbol']
         if not symbol in exchange_markets:
             # Add new market in exchange
-            exchange_markets[symbol] = markets[market]
+            exchange_markets[symbol] = {
+                'id': symbol,
+            }
             if not is_new_exchange:
                 # # Only handle new markets for existing exchanges (prevents
                 # # initial handling of all markets)
