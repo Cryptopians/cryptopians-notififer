@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 
 def get_exchange_clients():
     clients = []
-    exchanges = settings.CN_EXCHANGES
+    exchanges = settings.CN_EXCHANGES.split(',')
     for exchange in exchanges:
         klass = import_string('cn.api.%s.Api' % exchange)
         clients.append({
@@ -26,7 +26,7 @@ def run():
     if not initialized:
         logger.warning("Couldn't initialize store from remote")
     while True:
-        time.sleep(settings.CN_INTERVAL)
+        time.sleep(int(settings.CN_INTERVAL))
         for client in clients:
             result = client['instance'].get_exchange_info()
             store.add_currencies(client['exchange'], result['currencies'])
