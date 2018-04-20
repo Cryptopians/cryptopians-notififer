@@ -28,7 +28,7 @@ def run():
                     logger.warning(msg)
                 if markets:
                     store.add_markets(client, markets)
-        logger.info("Successfully verified data from %d exchanges" % len(clients))  # noqa
+        logger.info("Successfully verified data from %d exchanges" % len(ccxt.exchanges))  # noqa
         store.update_store()        
         time.sleep(int(settings.CN_INTERVAL))
 
