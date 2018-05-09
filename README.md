@@ -1,5 +1,7 @@
 # Cryptopians Notifier
 
+[![Build Status](https://travis-ci.org/Cryptopians/cryptopians-notifier.svg?branch=master)](https://travis-ci.org/Cryptopians/cryptopians-notifier)
+
 ## Requirements
 
 * Python 3.6
