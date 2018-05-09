@@ -71,14 +71,15 @@ def add_trading_pair(state, exchange, base_asset, quote_asset, is_new_asset):
     state[exchange.id]['assets'][base_asset].append(quote_asset)
     if not is_new_asset:
         notifications.notify_new_trading_pair(exchange, base_asset, quote_asset)
-    logger.info("New trading pair added '%s/%s' on exchange '%s'" % (base_asset, quote_asset, exchange.name))
+        logger.info("New trading pair added '%s/%s' on exchange '%s'" % (base_asset, quote_asset, exchange.name))
     return state
 
 
-def add_asset(state, exchange, base_asset, market):
+def add_asset(state, exchange, base_asset, market, is_new_exchange):
     state[exchange.id]['assets'][base_asset] = []
-    notifications.notify_new_asset(exchange, base_asset, market)
-    logger.info("New asset added '%s' on exchange '%s'" % (base_asset, exchange.name))
+    if not is_new_exchange:
+        notifications.notify_new_asset(exchange, base_asset, market)
+        logger.info("New asset added '%s' on exchange '%s'" % (base_asset, exchange.name))
     return state
 
 
@@ -119,7 +120,7 @@ def process_markets(exchange, markets={}):
         if not market_base_asset in state[exchange.id]['assets']:
             is_new_asset = True
             # Add new asset (e.g. BTC)
-            state = add_asset(state, exchange, market_base_asset, markets)
+            state = add_asset(state, exchange, market_base_asset, markets, is_new_exchange)
 
         if not market_quote_asset in state[exchange.id]['assets'][market_base_asset]:
             is_new_trading_pair = True

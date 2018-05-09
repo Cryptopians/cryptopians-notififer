@@ -54,7 +54,7 @@ def test_add_asset(mocker, exchange):
             'base': 'BTC',
             'quote': 'USD'
         }
-    })
+    }, True)
 
 
 def test_add_trading_pair(mocker, exchange):
