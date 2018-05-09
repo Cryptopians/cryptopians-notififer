@@ -12,21 +12,21 @@ logger = getLogger(__name__)
 
 s3 = boto3.resource('s3')
 
-state = {}
+_state = {}
 
 
 def get_state():
-    return state.copy()
+    return _state
 
 
 def set_state(value):
-    state = value
-    return state.copy()
+    _state = value
+    return _state
 
 
 def reset_state():
-    state = {}
-    return state.copy()
+    _state = {}
+    return _state
 
 
 def initialize_store():
@@ -54,7 +54,7 @@ def update_store():
             settings.S3_BUCKET_NAME, settings.S3_FILE_NAME)
         file_content = json.dumps({
             'last_updated': str(datetime.datetime.utcnow()),
-            'state': state,
+            'state': get_state(),
         })
         content_object.put(ACL='public-read', Body=file_content)
         logger.info("Successfully updated store")
