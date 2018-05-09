@@ -4,6 +4,8 @@ from setuptools import find_packages, setup
 test_require = [
     'flake8',
     'isort',
+    'pytest',
+    'pytest-mock',
 ]
 
 setup(
