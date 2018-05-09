@@ -19,3 +19,6 @@ isort:
 	isort --recursive --check-only --diff src/cn
 
 lint: flake8 isort
+
+test:
+	pytest tests

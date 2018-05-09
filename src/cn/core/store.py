@@ -1,5 +1,6 @@
 import datetime
 import json
+import sys
 
 import boto3
 
@@ -12,6 +13,20 @@ logger = getLogger(__name__)
 s3 = boto3.resource('s3')
 
 state = {}
+
+
+def get_state():
+    return state.copy()
+
+
+def set_state(value):
+    state = value
+    return state.copy()
+
+
+def reset_state():
+    state = {}
+    return state.copy()
 
 
 def initialize_store():
@@ -45,15 +60,19 @@ def update_store():
         logger.info("Successfully updated store")
     except:
         logger.warning("Couldn't update the remote store")
+        return False
+    return True
 
 
-def add_markets(exchange, markets=[]):
+def add_markets(exchange, markets={}):
     """Adds markets in (memory) store.
 
     This method is also responsible for detecting mutations in the store and
     handle further business logic for these mutations, e.g. notifications.
     """
     is_new_exchange = False
+    # Get local state
+    state = get_state()
     # Ensure exchange is stored in memory
     if exchange.id not in state:
         state[exchange.id] = {
@@ -71,8 +90,10 @@ def add_markets(exchange, markets=[]):
             exchange_markets[symbol] = {
                 'id': symbol,
             }
-            if not is_new_exchange:
+            if hasattr(sys, '_called_from_test') or not is_new_exchange:
                 # # Only handle new markets for existing exchanges (prevents
                 # # initial handling of all markets)
                 handler.handle_new_market(exchange, markets[market])
     state[exchange.id]['markets'] = exchange_markets
+    # Store local state
+    set_state(state)
