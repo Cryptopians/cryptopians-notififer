@@ -15,15 +15,16 @@ def test_reset_state():
     state = store.get_state()
     assert state == {}
 
-    state = store.set_state({'exchange': {}})
-    assert state == {'exchange': {}}
+    store.set_state({'exchange': {}})
+    assert store.get_state() == {'exchange': {}}
 
-    state = store.reset_state()
-    assert state == {}
+    store.reset_state()
+    assert store.get_state() == {}
 
 
-def xtest_add_exchange(mocker, exchange):
+def test_add_exchange(mocker, exchange):
     mocker.patch.object(store, 'add_exchange')
+    store.reset_state()
     store.process_markets(exchange, {
         'BTC/USD': {
             'base': 'BTC',
@@ -35,6 +36,7 @@ def xtest_add_exchange(mocker, exchange):
 
 def test_add_asset(mocker, exchange):
     mocker.patch.object(store, 'add_asset')
+    store.reset_state()
     store.process_markets(exchange, {
         'BTC/USD': {
             'base': 'BTC',
@@ -57,6 +59,7 @@ def test_add_asset(mocker, exchange):
 
 def test_add_trading_pair(mocker, exchange):
     mocker.patch.object(store, 'add_trading_pair')
+    store.reset_state()
     store.process_markets(exchange, {
         'BTC/USD': {
             'base': 'BTC',

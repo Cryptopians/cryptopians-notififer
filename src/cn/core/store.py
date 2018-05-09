@@ -16,15 +16,18 @@ _state = {}
 
 
 def get_state():
+    global _state
     return _state
 
 
 def set_state(value):
+    global _state
     _state = value
     return _state
 
 
 def reset_state():
+    global _state
     _state = {}
     return _state
 
@@ -40,7 +43,7 @@ def initialize_store():
             settings.S3_BUCKET_NAME, settings.S3_FILE_NAME)
         file_content = content_object.get()['Body'].read().decode('utf-8')
         json_content = json.loads(file_content)
-        state = json_content['state']
+        set_state(json_content['state'])
     except:
         logger.warning("Couldn't get the specified key from s3")
         return False
