@@ -28,6 +28,5 @@ def run():
                     msg = "Couldn't fetch data from '%s': %s" % (client.name, err)
                     logger.warning(msg)
         logger.info("Successfully verified data from %d exchanges" % len(ccxt.exchanges))  # noqa
-        store.update_store()        
+        store.update_store()
         time.sleep(int(settings.CN_INTERVAL))
-
