@@ -1,4 +1,4 @@
-from cn.core import handler, store
+from cn.core import notifications, store
 
 
 def test_initialize_store():
@@ -22,13 +22,48 @@ def test_reset_state():
     assert state == {}
 
 
-def test_handle_new_market(mocker, exchange):
-    mocker.patch.object(handler, 'handle_new_market')
-    store.add_markets(exchange, {
+def test_add_exchange(mocker, exchange):
+    mocker.patch.object(store, 'add_exchange')
+    store.process_markets(exchange, {
         'BTC/USD': {
-            'symbol': 'BTC/USD'
+            'base': 'BTC',
+            'quote': 'USD'
         }
     })
-    handler.handle_new_market.assert_called_with(exchange, {
-        'symbol': 'BTC/USD'
-    })
+    store.add_exchange.assert_called_once_with({}, exchange)
+
+
+def test_add_asset(mocker, exchange):
+    mocker.patch.object(store, 'add_asset')
+    store.process_markets(exchange, {
+        'BTC/USD': {
+            'base': 'BTC',
+            'quote': 'USD'
+        }
+    },)
+    store.add_asset.assert_called_once_with({
+        'binance': {
+            'id': 'binance',
+            'name': 'Binance',
+            'assets': {}
+        }
+    }, exchange, 'BTC')
+
+
+def test_add_trading_pair(mocker, exchange):
+    mocker.patch.object(store, 'add_trading_pair')
+    store.process_markets(exchange, {
+        'BTC/USD': {
+            'base': 'BTC',
+            'quote': 'USD'
+        }
+    },)
+    store.add_trading_pair.assert_called_once_with({
+        'binance': {
+            'id': 'binance',
+            'name': 'Binance',
+            'assets': {
+                'BTC': []
+            }
+        }
+    }, exchange, 'BTC', 'USD')

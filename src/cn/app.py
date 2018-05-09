@@ -22,11 +22,11 @@ def run():
             if client.has.get('publicAPI'):
                 try:
                     markets = client.load_markets()
-                    store.add_markets(client, markets)
+                    store.process_markets(client, markets)
                 except:
                     err = sys.exc_info()[0]
                     msg = "Couldn't fetch data from '%s': %s" % (client.name, err)
                     logger.warning(msg)
-        logger.info("Successfully verified data from %d exchanges" % len(ccxt.exchanges))  # noqa
+        logger.info("Successfully verified data from %d exchanges" % len(ccxt.exchanges))
         store.update_store()
         time.sleep(int(settings.CN_INTERVAL))

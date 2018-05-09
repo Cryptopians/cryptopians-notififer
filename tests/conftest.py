@@ -19,5 +19,8 @@ def exchange():
             self.__dict__ = self
     return AttrDict({
         'id': 'binance',
-        'name': 'Binance'
+        'name': 'Binance',
+        'urls': {
+            'www': 'https://www.binance.com',
+        },
     })

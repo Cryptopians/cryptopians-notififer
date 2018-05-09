@@ -5,7 +5,7 @@ import sys
 import boto3
 
 from cn import settings
-from cn.core import handler
+from cn.core import notifications
 from cn.utils.logging import getLogger
 
 logger = getLogger(__name__)
@@ -40,8 +40,8 @@ def initialize_store():
             settings.S3_BUCKET_NAME, settings.S3_FILE_NAME)
         file_content = content_object.get()['Body'].read().decode('utf-8')
         json_content = json.loads(file_content)
-        state = json_content['state']  # noqa
-    except:  # noqa
+        state = json_content['state']
+    except:
         logger.warning("Couldn't get the specified key from s3")
         return False
     return True
@@ -64,36 +64,68 @@ def update_store():
     return True
 
 
-def add_markets(exchange, markets={}):
-    """Adds markets in (memory) store.
+def add_trading_pair(state, exchange, base_asset, quote_asset, is_new_asset):
+    state[exchange.id]['assets'][base_asset].append(quote_asset)
+    if not is_new_asset:
+        notifications.notify_new_trading_pair(exchange, base_asset, quote_asset)
+    logger.info("New trading pair added '%s/%s' on exchange '%s'" % (base_asset, quote_asset, exchange.name))
+    return state
+
+
+def add_asset(state, exchange, base_asset, market):
+    state[exchange.id]['assets'][base_asset] = []
+    notifications.notify_new_asset(exchange, base_asset, market)
+    logger.info("New asset added '%s' on exchange '%s'" % (base_asset, exchange.name))
+    return state
+
+
+def add_exchange(state, exchange):
+    state[exchange.id] = {
+        'id': exchange.id,
+        'name': exchange.name,
+        'assets': {},
+    }
+    notifications.notify_new_exchange(exchange)
+    logger.info("New exchange added '%s'" % exchange.name)
+    return state
+
+
+def process_markets(exchange, markets={}):
+    """Process markets in (memory) store.
 
     This method is also responsible for detecting mutations in the store and
     handle further business logic for these mutations, e.g. notifications.
     """
+    new_assets = []
     is_new_exchange = False
+
     # Get local state
     state = get_state()
-    # Ensure exchange is stored in memory
-    if exchange.id not in state:
-        state[exchange.id] = {
-            'markets': {},
-            'id': exchange.id,
-            'name': exchange.name,
-        }
+
+    if not exchange.id in state:
         is_new_exchange = True
-        logger.info("New exchange added '%s'" % exchange.name)
-    exchange_markets = state[exchange.id]['markets']
+        # Add new exchange (e.g. Binance)
+        state = add_exchange(state, exchange)
+
     for market in markets:
-        symbol = markets[market]['symbol']
-        if not symbol in exchange_markets:
-            # Add new market in exchange
-            exchange_markets[symbol] = {
-                'id': symbol,
-            }
-            if hasattr(sys, '_called_from_test') or not is_new_exchange:
-                # # Only handle new markets for existing exchanges (prevents
-                # # initial handling of all markets)
-                handler.handle_new_market(exchange, markets[market])
-    state[exchange.id]['markets'] = exchange_markets
+        market_base_asset = markets[market]['base']
+        market_quote_asset = markets[market]['quote']
+
+        is_new_asset = market_base_asset in new_assets
+        is_new_trading_pair = False
+
+        if not market_base_asset in state[exchange.id]['assets']:
+            new_assets.append(market_base_asset)
+            is_new_asset = True
+            # Add new asset (e.g. BTC)
+            state = add_asset(state, exchange, market_base_asset, markets)
+
+        if not market_quote_asset in state[exchange.id]['assets'][market_base_asset]:
+            is_new_trading_pair = True
+            # Add new trading pair (e.g. BTC/USD)
+            state = add_trading_pair(state, exchange, market_base_asset, market_quote_asset, is_new_asset)
+
     # Store local state
     set_state(state)
+
+    return state
