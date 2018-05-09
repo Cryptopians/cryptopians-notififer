@@ -96,8 +96,8 @@ def process_markets(exchange, markets={}):
     This method is also responsible for detecting mutations in the store and
     handle further business logic for these mutations, e.g. notifications.
     """
-    new_assets = []
     is_new_exchange = False
+    is_new_asset = False
 
     # Get local state
     state = get_state()
@@ -111,11 +111,9 @@ def process_markets(exchange, markets={}):
         market_base_asset = markets[market]['base']
         market_quote_asset = markets[market]['quote']
 
-        is_new_asset = market_base_asset in new_assets
         is_new_trading_pair = False
 
         if not market_base_asset in state[exchange.id]['assets']:
-            new_assets.append(market_base_asset)
             is_new_asset = True
             # Add new asset (e.g. BTC)
             state = add_asset(state, exchange, market_base_asset, markets)

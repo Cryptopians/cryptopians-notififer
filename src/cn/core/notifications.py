@@ -18,7 +18,6 @@ def to_slack(message):
         except:
             logger.warning("Couldn't send text message to Slack")
 
-
 def notify_new_trading_pair(exchange, base_asset, quote_asset):
     to_slack("New trading pair %s/%s added to %s (%s)" % (
         base_asset,
