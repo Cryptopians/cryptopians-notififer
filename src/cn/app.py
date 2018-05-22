@@ -17,6 +17,8 @@ def run():
         logger.warning("Couldn't initialize store from remote")
     while True:
         for exchange in ccxt.exchanges:
+            if exchange in settings.BLACKLISTED_EXCHANGES:
+                continue
             klass = import_string('ccxt.%s' % exchange)
             client = klass()
             if client.has.get('publicAPI'):
